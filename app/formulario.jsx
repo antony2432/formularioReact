@@ -2,7 +2,13 @@
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 
-export default function Formulario({ alldistritos, alltecnicos }) {
+export default function Formulario({
+  alldistritos,
+  alltecnicos,
+  allplanes,
+  allservicios,
+  allrouters,
+}) {
   const [loading, setLoading] = useState(false);
   const {
     register,
@@ -21,7 +27,7 @@ export default function Formulario({ alldistritos, alltecnicos }) {
     setValue("referencia", "");
     setValue("correo", "");
     setValue("tecnico", "");
-    setValue("fecha", "");
+    setValue("fecha_de_instalacion", "");
     setValue("cintillo", "");
     setValue("plan", "");
     setValue("servicio", "");
@@ -33,7 +39,18 @@ export default function Formulario({ alldistritos, alltecnicos }) {
     const re = /\S+@\S+\.\S+/;
     return re.test(email);
   };
-  const onSubmit = (data) => console.log(data);
+  const onSubmit = (data) => {
+    const cliente = new URLSearchParams(data)
+    fetch(`http://localhost:4010/clientes`, {
+      method: "POST",
+      body: cliente,
+    })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(data);
+      // reset();
+    })
+  }
   const inputStyle =
     "border border-[#dee2e6] rounded-lg text-gray-700 font-normal px-3 py-2 bg-white focus:border-[#5e72e4] focus:border focus:outline-none w-full";
   return (
@@ -230,50 +247,100 @@ export default function Formulario({ alldistritos, alltecnicos }) {
         </select>
       </div>
       <div className="col-span-6">
-        <label htmlFor="fecha" className="block text-label mb-2">Fecha</label>
+        <label htmlFor="fecha_de_instalacion" className="block text-label mb-2">
+          Fecha
+        </label>
         <input
           type="date"
-          id="fecha"
-          {...register("fecha")}
+          id="fecha_de_instalacion"
+          {...register("fecha_de_instalacion")}
           className={inputStyle}
           required
         />
       </div>
-      <label htmlFor="cintillo">cintillo</label>
-      <input
-        type="number"
-        id="cintillo"
-        {...register("cintillo")}
-        className={inputStyle}
-      />
-      <label htmlFor="plan">plan</label>
-      <select id="plan" {...register("plan")} className={inputStyle}>
-        <option value="40Mbps">40 Mbps</option>
-        <option value="80Mbps">80 Mbps</option>
-        <option value="100Mbps">100 Mbps</option>
-        <option value="300Mbps">300 Mbps</option>
-      </select>
-      <label htmlFor="servicio">servicio</label>
-      <select id="servicio" {...register("servicio")} className={inputStyle}>
-        <option value="internet">internet</option>
-        <option value="cable">cable</option>
-        <option value="internet+cable">internet+cable</option>
-      </select>
-      <label htmlFor="cajaNap">caja Nap</label>
-      <input
-        type="text"
-        id="cajaNap"
-        {...register("cajaNap")}
-        className={inputStyle}
-      />
-      <label htmlFor="sn">sn</label>
-      <input type="text" id="sn" {...register("sn")} className={inputStyle} />
-      <label htmlFor="router">router</label>
-      <select id="router" {...register("router")} className={inputStyle}>
-        <option value="tplink">tplink</option>
-        <option value="huawei">Huawei</option>
-        <option value="zte">zte</option>
-      </select>
+      <div className="col-span-4">
+        <label htmlFor="cintillo" className="block text-label mb-2">
+          cintillo
+        </label>
+        <input
+          type="number"
+          id="cintillo"
+          {...register("cintillo")}
+          className={inputStyle}
+        />
+      </div>
+      <div className="col-span-4">
+        <label htmlFor="plan" className="block text-label mb-2">
+          plan
+        </label>
+        <select id="plan" {...register("plan")} className={inputStyle} required>
+          <option value="">Seleccione un plan</option>
+          {allplanes.map((plan) => (
+            <option key={plan.id} value={plan.plan}>
+              {plan.plan}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="col-span-4">
+        <label htmlFor="servicio" className="block text-label mb-2">
+          servicio
+        </label>
+        <select
+          id="servicio"
+          {...register("servicio")}
+          className={inputStyle}
+          required
+        >
+          <option value="">Seleccione un servicio</option>
+          {allservicios.map((servicio) => (
+            <option key={servicio.id} value={servicio.servicio}>
+              {servicio.servicio}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="col-span-4">
+        <label htmlFor="cajanap" className="block text-label mb-2">
+          caja Nap
+        </label>
+        <input
+          type="text"
+          id="cajanap"
+          {...register("cajanap")}
+          className={inputStyle}
+        />
+      </div>
+      <div className="col-span-4">
+        <label htmlFor="sn" className="block text-label mb-2">
+          sn
+        </label>
+        <input
+          type="text"
+          id="sn"
+          {...register("sn")}
+          className={inputStyle}
+          required
+        />
+      </div>
+      <div className="col-span-4">
+        <label htmlFor="router" className="block text-label mb-2">
+          router
+        </label>
+        <select
+          id="router"
+          {...register("router")}
+          className={inputStyle}
+          required
+        >
+          <option value="">Seleccione un router</option>
+          {allrouters.map((router) => (
+            <option key={router.id} value={router.marca}>
+              {router.marca}
+            </option>
+          ))}
+        </select>
+      </div>
       <div className="col-span-6 mb-4 flex justify-end">
         <button
           type="submit"
